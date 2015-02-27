@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <script type="text/javascript">
+        function WebSocketTest() {
+            var messageContainer = document.getElementById("messages");
+            if ("WebSocket" in window) {
+                messageContainer.innerHTML = "WebSocket is supported by your Browser!";
+                var ws = new WebSocket("ws://localhost:8888/ws?id=123456789");
+                ws.onopen = function() {
+                    ws.send("Hello, world");
+                };
+                ws.onmessage = function (evt) {
+                    var received_msg = evt.data;
+                    messageContainer.innerHTML = "Message is received..." + received_msg;
+                };
+                ws.onclose = function() {
+                    messageContainer.innerHTML = "Connection is closed...";
+                };
+            } else {
+                messageContainer.innerHTML = "WebSocket NOT supported by your Browser!";
+            }
+        }
+
+        function EchoTest() {
+            var ws = new WebSocket('ws://localhost:8888/echo');
+            ws.onopen = function() {
+                ws.send("Hello, world");
+            }
+            ws.onmessage = function (evt) {
+                alert(evt.data);
+            }
+        }
+
+        function AddTest() {
+            var first_number = document.getElementById("first_number").value;
+            var second_number = document.getElementById("second_number").value;
+
+            var ws = new WebSocket("ws://" + location.host + "/add");
+            console.log(ws);
+            ws.onopen = function() {
+                var data = {
+                    "first_number": first_number,
+                    "second_number": second_number
+                };
+                ws.send(JSON.stringify(data));
+            }
+            ws.onmessage = function(evt) {
+                var result = document.getElementById("result");
+                result.innerHTML = evt.data;
+            }
+        }
+        </script>
+    </head>
+    <body>
+        <a href="javascript:EchoTest()">Echo</a>
+        <a href="javascript:WebSocketTest()">Run WebSocket</a>
+        <div id="messages" style="height:200px;background:black;color:white;"></div>
+        <br>
+        <div id="calculator">
+            <input type="text" id="first_number">
+            <input type="text" id="second_number">
+            <span id="result"> Result here. </span>
+        </div>
+        <a href="javascript:AddTest()">Add</a>
+    </body>
+</html>
